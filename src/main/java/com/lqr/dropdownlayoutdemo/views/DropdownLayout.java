@@ -31,6 +31,7 @@ public class DropdownLayout extends FrameLayout {
     private Context mContext;
 
     /*------------------ 自定义属性 begin  ------------------*/
+    private boolean onlyShowOne = false;
     private int cols = 1;//下拉菜单列数，默认是1
 
     /**
@@ -52,6 +53,8 @@ public class DropdownLayout extends FrameLayout {
     }
 
     //下拉按钮
+    private String topBtnTextPrefix = null;
+    private String topBtnTextSuffix = null;
     private int topBg = Color.WHITE;
     private int topHeight = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 48f, getResources().getDisplayMetrics());
     private int topSplitLineColor = Color.LTGRAY;
@@ -120,9 +123,18 @@ public class DropdownLayout extends FrameLayout {
         for (int i = 0; i < indexCount; i++) {
             int attr = typedArray.getIndex(i);
             switch (attr) {
-                //下拉按钮
+                case R.styleable.DropdownLayout_ddl_only_show_one:
+                    onlyShowOne = typedArray.getBoolean(attr, false);
+                    break;
                 case R.styleable.DropdownLayout_ddl_cols:
                     cols = typedArray.getInt(attr, 1);
+                    break;
+                //下拉按钮
+                case R.styleable.DropdownLayout_ddl_top_btn_text_prefix:
+                    topBtnTextPrefix = typedArray.getString(attr);
+                    break;
+                case R.styleable.DropdownLayout_ddl_top_btn_text_suffix:
+                    topBtnTextSuffix = typedArray.getString(attr);
                     break;
                 case R.styleable.DropdownLayout_ddl_top_bg:
                     topBg = typedArray.getColor(attr, Color.WHITE);
@@ -139,13 +151,13 @@ public class DropdownLayout extends FrameLayout {
                 case R.styleable.DropdownLayout_ddl_top_split_line_height:
                     topSplitLineHeight = (int) typedArray.getDimension(attr, TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, attr, getResources().getDisplayMetrics()));
                     break;
-                case R.styleable.DropdownLayout_ddl_top_text_size:
+                case R.styleable.DropdownLayout_ddl_top_btn_text_size:
                     topTextSize = (int) typedArray.getDimension(attr, TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_SP, attr, getResources().getDisplayMetrics()));
                     break;
-                case R.styleable.DropdownLayout_ddl_top_text_normal_color:
+                case R.styleable.DropdownLayout_ddl_top_btn_text_normal_color:
                     topTextNormalColor = typedArray.getColor(attr, Color.BLACK);
                     break;
-                case R.styleable.DropdownLayout_ddl_top_text_selected_color:
+                case R.styleable.DropdownLayout_ddl_top_btn_text_selected_color:
                     topTextSelectedColor = typedArray.getColor(attr, Color.BLACK);
                     break;
                 case R.styleable.DropdownLayout_ddl_top_btn_noraml_drawable:
@@ -381,6 +393,11 @@ public class DropdownLayout extends FrameLayout {
      * @param dropdownListView
      */
     private void setDropdownListAndItemViewStyle(DropdownListView dropdownListView) {
+        dropdownListView.setOnlyShowOne(onlyShowOne);
+        if (topBtnTextPrefix != null)
+            dropdownListView.setTopBtnTextPrefix(topBtnTextPrefix);
+        if (topBtnTextSuffix != null)
+            dropdownListView.setTopBtnTextSuffix(topBtnTextSuffix);
         if (listMaxHeight != -1)
             dropdownListView.setListMaxHeight(listMaxHeight);
         if (itemPaddingLeft != -1)

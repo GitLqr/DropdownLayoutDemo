@@ -110,7 +110,24 @@ public class DropdownListView extends ScrollView {
                 boolean checked = data == current;
                 String suffix = data.getSuffix();
                 itemView.bind(TextUtils.isEmpty(suffix) ? data.text : data.text + suffix, checked);
-                if (checked) button.setText(data.text);
+
+                if (checked) {
+                    //如果设置了下拉按钮与下拉列表中只显示一个
+                    if (onlyShowOne) {
+                        //则隐藏下拉列表中的item
+                        itemView.setVisibility(View.GONE);
+                    }
+                    String text = data.text;
+                    if (!TextUtils.isEmpty(topBtnTextPrefix)) {
+                        text = topBtnTextPrefix + text;
+                    }
+                    if (!TextUtils.isEmpty(topBtnTextSuffix)) {
+                        text = text + topBtnTextSuffix;
+                    }
+                    button.setText(text);
+                } else {
+                    itemView.setVisibility(View.VISIBLE);
+                }
             }
         }
 
@@ -239,7 +256,24 @@ public class DropdownListView extends ScrollView {
         void onSelectionChanged(DropdownListView view);
     }
 
+    /*================== DropdownButton的属性 begin ==================*/
+    private boolean onlyShowOne = false;
+    private String topBtnTextPrefix = null;
+    private String topBtnTextSuffix = null;
 
+    public void setOnlyShowOne(boolean onlyShowOne) {
+        this.onlyShowOne = onlyShowOne;
+    }
+
+    public void setTopBtnTextPrefix(String topBtnTextPrefix) {
+        this.topBtnTextPrefix = topBtnTextPrefix;
+    }
+
+    public void setTopBtnTextSuffix(String topBtnTextSuffix) {
+        this.topBtnTextSuffix = topBtnTextSuffix;
+    }
+
+    /*================== DropdownButton的属性 begin ==================*/
     /*================== DropdownList的属性 begin ==================*/
     private int listMaxHeight = -1;
 

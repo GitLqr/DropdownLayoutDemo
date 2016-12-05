@@ -65,92 +65,118 @@
     }
 }
 
+![image](screenshots/1.gif)
+
+除此之外，还可以设置为选中项不在下拉列表中显示，可以给下拉按钮文字设置前缀和后缀
+
+	<com.lqr.dropdownlayoutdemo.views.DropdownLayout
+        android:id="@+id/dl"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        app:ddl_only_show_one="true"
+        app:ddl_top_btn_text_prefix="头--"
+        app:ddl_top_btn_text_suffix="--尾"
+        />
+
+![image](screenshots/2.gif)
+
+
 
 
 以下是自定义的属性，用于xml布局，绝大程度地订制整个下拉控件：
 	<resources>
-    <declare-styleable name="DropdownLayout">
-	    <!--下拉列表的列数-->
-	    <attr name="ddl_cols" format="integer"/>
-	    <!--下拉按钮区背景-->
-	    <attr name="ddl_top_bg" format="color"/>
-	    <!--下拉按钮区的高度-->
-	    <attr name="ddl_top_height" format="dimension"/>
-	    <!--下拉按钮区的分割线颜色-->
-	    <attr name="ddl_top_split_line_color" format="color"/>
-	    <!--下拉按钮区的分割线宽度-->
-	    <attr name="ddl_top_split_line_width" format="dimension"/>
-	    <!--下拉按钮区的分割线高度-->
-	    <attr name="ddl_top_split_line_height" format="dimension"/>
+	    <declare-styleable name="DropdownLayout">
+	        <!--下拉列表的列数-->
+	        <attr name="ddl_cols" format="integer"/>
+	        <!--下拉按钮与下拉列表中只显示一个，如果在下拉列表中选择了item5，则item5消失，下拉按钮显示item5的name-->
+	        <attr name="ddl_only_show_one" format="boolean"/>
+	        
+	        <!--下拉按钮区背景-->
+	        <attr name="ddl_top_bg" format="color"/>
+	        <!--下拉按钮区的高度-->
+	        <attr name="ddl_top_height" format="dimension"/>
+	        <!--下拉按钮区的分割线颜色-->
+	        <attr name="ddl_top_split_line_color" format="color"/>
+	        <!--下拉按钮区的分割线宽度-->
+	        <attr name="ddl_top_split_line_width" format="dimension"/>
+	        <!--下拉按钮区的分割线高度-->
+	        <attr name="ddl_top_split_line_height" format="dimension"/>
 	
-	    <!--下拉按钮文字大小-->
-	    <attr name="ddl_top_text_size" format="dimension"/>
-	    <!--下拉按钮未选中时文字颜色-->
-	    <attr name="ddl_top_text_normal_color" format="color"/>
-	    <!--下拉按钮选中时文字颜色-->
-	    <attr name="ddl_top_text_selected_color" format="color"/>
-	    <!--下拉按钮文字未选中时显示的图标-->
-	    <attr name="ddl_top_btn_selected_drawable" format="reference"/>
-	    <!--下拉按钮文字选中时显示的图标-->
-	    <attr name="ddl_top_btn_noraml_drawable" format="reference"/>
+	        <!--下拉按钮文本前缀-->
+	        <attr name="ddl_top_btn_text_prefix" format="string"/>
+	        <!--下拉按钮文本后缀-->
+	        <attr name="ddl_top_btn_text_suffix" format="string"/>
+	        <!--下拉按钮文字大小-->
+	        <attr name="ddl_top_btn_text_size" format="dimension"/>
+	        <!--下拉按钮未选中时文字颜色-->
+	        <attr name="ddl_top_btn_text_normal_color" format="color"/>
+	        <!--下拉按钮选中时文字颜色-->
+	        <attr name="ddl_top_btn_text_selected_color" format="color"/>
+	        <!--下拉按钮文字未选中时显示的图标-->
+	        <attr name="ddl_top_btn_selected_drawable" format="reference"/>
+	        <!--下拉按钮文字选中时显示的图标-->
+	        <attr name="ddl_top_btn_noraml_drawable" format="reference"/>
 	
-	    <!--下划线宽度-->
-	    <attr name="ddl_top_bottom_line_width" format="dimension"/>
-	    <!--下划线高度-->
-	    <attr name="ddl_top_bottom_line_height" format="dimension"/>
-	    <!--下划线颜色-->
-	    <attr name="ddl_top_bottom_line_color" format="color"/>
+	        <!--下划线宽度-->
+	        <attr name="ddl_top_bottom_line_width" format="dimension"/>
+	        <!--下划线高度-->
+	        <attr name="ddl_top_bottom_line_height" format="dimension"/>
+	        <!--下划线颜色-->
+	        <attr name="ddl_top_bottom_line_color" format="color"/>
 	
-	    <!--分割线颜色-->
-	    <attr name="ddl_split_line_color" format="color"/>
-	    <!--分割线宽度-->
-	    <attr name="ddl_split_line_width" format="dimension"/>
-	    <!--分割线高度-->
-	    <attr name="ddl_split_line_height" format="dimension"/>
+	        <!--分割线颜色-->
+	        <attr name="ddl_split_line_color" format="color"/>
+	        <!--分割线宽度-->
+	        <attr name="ddl_split_line_width" format="dimension"/>
+	        <!--分割线高度-->
+	        <attr name="ddl_split_line_height" format="dimension"/>
 	
-	    <!--遮盖层颜色-->
-	    <attr name="ddl_mask_bg" format="color"/>
+	        <!--遮盖层颜色-->
+	        <attr name="ddl_mask_bg" format="color"/>
 	
-	    <!--下拉列表的最大高度-->
-	    <attr name="ddl_list_max_height" format="dimension"/>
+	        <!--下拉列表的最大高度-->
+	        <attr name="ddl_list_max_height" format="dimension"/>
 	
-	    <!--下拉列表item的左内间距-->
-	    <attr name="ddl_item_padding_left" format="dimension"/>
-	    <!--下拉列表item的右内间距-->
-	    <attr name="ddl_item_padding_right" format="dimension"/>
-	    <!--下拉列表item的高度-->
-	    <attr name="ddl_item_height" format="dimension"/>
-	    <!--下拉列表item文字大小-->
-	    <attr name="ddl_item_text_size" format="dimension"/>
-	    <!--下拉列表item未选中时文字颜色-->
-	    <attr name="ddl_item_text_normal_color" format="color"/>
-	    <!--下拉列表item选中时文字颜色-->
-	    <attr name="ddl_item_text_selected_color" format="color"/>
-	    <!--下拉列表item未选中时背景颜色-->
-	    <attr name="ddl_item_normal_bg" format="color"/>
-	    <!--下拉列表item选中时背景颜色-->
-	    <attr name="ddl_item_selected_bg" format="color"/>
-	    <!--下拉列表item未选中图标-->
-	    <attr name="ddl_item_normal_drawable" format="reference"/>
-	    <!--下拉列表item选中图标-->
-	    <attr name="ddl_item_selected__drawable" format="reference"/>
-	    <!--下拉列表item的文字位置-->
-	    <attr name="ddl_item_text_gravity">
-	        <enum name="center" value="0"></enum>
-	        <enum name="left" value="1"></enum>
-	        <enum name="right" value="2"></enum>
-	    </attr>
+	        <!--下拉列表item的左内间距-->
+	        <attr name="ddl_item_padding_left" format="dimension"/>
+	        <!--下拉列表item的右内间距-->
+	        <attr name="ddl_item_padding_right" format="dimension"/>
+	        <!--下拉列表item的高度-->
+	        <attr name="ddl_item_height" format="dimension"/>
+	        <!--下拉列表item文字大小-->
+	        <attr name="ddl_item_text_size" format="dimension"/>
+	        <!--下拉列表item未选中时文字颜色-->
+	        <attr name="ddl_item_text_normal_color" format="color"/>
+	        <!--下拉列表item选中时文字颜色-->
+	        <attr name="ddl_item_text_selected_color" format="color"/>
+	        <!--下拉列表item未选中时背景颜色-->
+	        <attr name="ddl_item_normal_bg" format="color"/>
+	        <!--下拉列表item选中时背景颜色-->
+	        <attr name="ddl_item_selected_bg" format="color"/>
+	        <!--下拉列表item未选中图标-->
+	        <attr name="ddl_item_normal_drawable" format="reference"/>
+	        <!--下拉列表item选中图标-->
+	        <attr name="ddl_item_selected__drawable" format="reference"/>
+	        <!--下拉列表item的文字位置-->
+	        <attr name="ddl_item_text_gravity">
+	            <enum name="center" value="0"></enum>
+	            <enum name="left" value="1"></enum>
+	            <enum name="right" value="2"></enum>
+	        </attr>
 	
-	    <!--下拉列表item下划线高度-->
-	    <attr name="ddl_item_bottom_line_height" format="dimension"/>
-	    <!--下拉列表item下划线左边距-->
-	    <attr name="ddl_item_bottom_line_margin_left" format="dimension"/>
-	    <!--下拉列表item下划线右边距-->
-	    <attr name="ddl_item_bottom_line_margin_right" format="dimension"/>
-	    <!--下拉列表item下划线颜色-->
-	    <attr name="ddl_item_bottom_line_color" format="color"/>
-	</declare-styleable>
+	        <!--下拉列表item下划线高度-->
+	        <attr name="ddl_item_bottom_line_height" format="dimension"/>
+	        <!--下拉列表item下划线左边距-->
+	        <attr name="ddl_item_bottom_line_margin_left" format="dimension"/>
+	        <!--下拉列表item下划线右边距-->
+	        <attr name="ddl_item_bottom_line_margin_right" format="dimension"/>
+	        <!--下拉列表item下划线颜色-->
+	        <attr name="ddl_item_bottom_line_color" format="color"/>
+	
+	
+	    </declare-styleable>
+	</resources>
+
 
 注意：目前级联还有些小问题（如：第二列选择了第二个，在第一列更新需要级联的数据时，第二列仍然选中第二个），之后有时间会解决，如果不使用级联，目前项目非常好用。
 
-![image](screenshots/hehe.gif)
