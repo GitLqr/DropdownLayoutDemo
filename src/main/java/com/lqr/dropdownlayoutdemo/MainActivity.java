@@ -1,13 +1,13 @@
 package com.lqr.dropdownlayoutdemo;
 
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.app.AppCompatActivity;
 import android.widget.TextView;
 
 import com.lqr.dropdownlayoutdemo.views.DropdownLayout;
 
 import java.util.ArrayList;
-import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -29,7 +29,7 @@ public class MainActivity extends AppCompatActivity {
         //创建下拉列表数据
         final List<Map<String, String>> listData = new ArrayList<>();
         for (int i = 0; i < mDl.getCols(); i++) {
-            Map<String, String> map = new HashMap<>();
+            Map<String, String> map = new LinkedHashMap<>();
             for (int j = 0; j < 6; j++) {
                 map.put("name " + j, "value " + j);
             }
