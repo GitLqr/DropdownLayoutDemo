@@ -38,9 +38,9 @@ public class MainActivity extends AppCompatActivity {
 
 
         mDl.init(tv, listData);
-        mDl.setOnDropdownListChecked(new DropdownLayout.OnDropdownListChecked() {
+        mDl.setOnDropdownListListener(new DropdownLayout.OnDropdownListListener() {
             @Override
-            public void onDropdownListChecked(int indexOfButton, int indexOfList, String textOfList, String valueOfList) {
+            public void OnDropdownListSelected(int indexOfButton, int indexOfList, String textOfList, String valueOfList) {
                 //当第一列的第二个被选中时
                 if (indexOfButton == 0 && indexOfList == 1) {
                     Map<String, String> map = listData.get(1);
@@ -58,6 +58,17 @@ public class MainActivity extends AppCompatActivity {
                 //刷新下拉列表数据
                 mDl.notifyDataSetChanged();
             }
+
+            @Override
+            public void onDropdownListOpen() {
+
+            }
+
+            @Override
+            public void onDropdownListClosed() {
+
+            }
+
         });
     }
 }

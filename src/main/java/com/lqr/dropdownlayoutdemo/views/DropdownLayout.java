@@ -28,9 +28,15 @@ import java.util.Map;
  */
 public class DropdownLayout extends FrameLayout {
 
+    //与自定义属性对应的gravity值
+    public static final int GRAVITY_CENTER = 0;
+    public static final int GRAVITY_LEFT = 1;
+    public static final int GRAVITY_RIGHT = 2;
+
     private Context mContext;
 
     /*------------------ 自定义属性 begin  ------------------*/
+    private boolean animationEnabled = true;
     private boolean onlyShowOne = false;
     private int cols = 1;//下拉菜单列数，默认是1
 
@@ -111,9 +117,14 @@ public class DropdownLayout extends FrameLayout {
     private List<List<DropdownItemObject>> mAllDropdownListData = new ArrayList<>();
 
     private Animation dropdown_in, dropdown_out, dropdown_mask_out;
-    private DropdownButtonsController dropdownButtonsController = new DropdownButtonsController();
+    public DropdownButtonsController dropdownButtonsController = new DropdownButtonsController();
 
     private int i = 0;
+
+    public DropdownLayout(Context context) {
+        super(context);
+        mContext = context;
+    }
 
     public DropdownLayout(Context context, AttributeSet attrs) {
         super(context, attrs);
@@ -228,17 +239,6 @@ public class DropdownLayout extends FrameLayout {
                     break;
                 case R.styleable.DropdownLayout_ddl_item_text_gravity:
                     itemTextGravity = typedArray.getInt(attr, -1);
-                    switch (itemTextGravity) {
-                        case 0://居中
-                            itemTextGravity = Gravity.CENTER;
-                            break;
-                        case 1://左
-                            itemTextGravity = Gravity.LEFT | Gravity.CENTER_VERTICAL;
-                            break;
-                        case 2://右
-                            itemTextGravity = Gravity.RIGHT | Gravity.CENTER_VERTICAL;
-                            break;
-                    }
                     break;
                 //item下划线
                 case R.styleable.DropdownLayout_ddl_item_bottom_line_height:
@@ -420,8 +420,20 @@ public class DropdownLayout extends FrameLayout {
             dropdownListView.setItemNormalDrawableResId(itemNormalDrawable);
         if (itemSelectedDrawable != -1)
             dropdownListView.setItemSelectedDrawableResId(itemSelectedDrawable);
-        if (itemTextGravity != -1)
+        if (itemTextGravity != -1) {
+            switch (itemTextGravity) {
+                case 0://居中
+                    itemTextGravity = Gravity.CENTER;
+                    break;
+                case 1://左
+                    itemTextGravity = Gravity.LEFT | Gravity.CENTER_VERTICAL;
+                    break;
+                case 2://右
+                    itemTextGravity = Gravity.RIGHT | Gravity.CENTER_VERTICAL;
+                    break;
+            }
             dropdownListView.setItemTextGravity(itemTextGravity);
+        }
         if (itemBottomLineHeight != -1)
             dropdownListView.setItemBottomLineHeight(itemBottomLineHeight);
         if (itemBottomLineMarginLeft != -1)
@@ -436,14 +448,15 @@ public class DropdownLayout extends FrameLayout {
      * @创建者 CSDN_LQR
      * @描述 下拉按钮与下拉列表的核心控制器
      */
-    private class DropdownButtonsController implements DropdownListView.Container {
+    public class DropdownButtonsController implements DropdownListView.Container {
         private DropdownListView currentDropdownList;
 
         @Override
         public void show(DropdownListView view) {
             if (currentDropdownList != null) {
                 currentDropdownList.clearAnimation();
-                currentDropdownList.startAnimation(dropdown_out);
+                if (animationEnabled)
+                    currentDropdownList.startAnimation(dropdown_out);
                 currentDropdownList.setVisibility(View.GONE);
                 currentDropdownList.button.setChecked(false);
             }
@@ -451,29 +464,42 @@ public class DropdownLayout extends FrameLayout {
             mask.clearAnimation();
             mask.setVisibility(View.VISIBLE);
             currentDropdownList.clearAnimation();
-            currentDropdownList.startAnimation(dropdown_in);
+            if (animationEnabled)
+                currentDropdownList.startAnimation(dropdown_in);
             currentDropdownList.setVisibility(View.VISIBLE);
             currentDropdownList.button.setChecked(true);
+
+            if (mOnDropdownListListener != null) {
+                mOnDropdownListListener.onDropdownListOpen();
+            }
         }
 
         @Override
         public void hide() {
             if (currentDropdownList != null) {
                 currentDropdownList.clearAnimation();
-                currentDropdownList.startAnimation(dropdown_out);
+                if (animationEnabled)
+                    currentDropdownList.startAnimation(dropdown_out);
                 currentDropdownList.button.setChecked(false);
                 mask.clearAnimation();
-                mask.startAnimation(dropdown_mask_out);
+                if (animationEnabled)
+                    mask.startAnimation(dropdown_mask_out);
             }
             currentDropdownList = null;
+            if (!animationEnabled)
+                reset();
+
+            if (mOnDropdownListListener != null) {
+                mOnDropdownListListener.onDropdownListClosed();
+            }
         }
 
         @Override
         public void onSelectionChanged(DropdownListView view) {
-            if (onDropdownListChecked != null) {
+            if (mOnDropdownListListener != null) {
                 int indexOf = mDropdownListViewList.indexOf(view);
                 DropdownItemObject current = view.current;
-                onDropdownListChecked.onDropdownListChecked(indexOf, current.id, current.text, current.value);
+                mOnDropdownListListener.OnDropdownListSelected(indexOf, current.id, current.text, current.value);
             }
         }
 
@@ -549,13 +575,13 @@ public class DropdownLayout extends FrameLayout {
     }
 
     /*================== 下拉列表item的点击回调 begin ==================*/
-    private OnDropdownListChecked onDropdownListChecked;
+    private OnDropdownListListener mOnDropdownListListener;
 
-    public void setOnDropdownListChecked(OnDropdownListChecked onDropdownListChecked) {
-        this.onDropdownListChecked = onDropdownListChecked;
+    public void setOnDropdownListListener(OnDropdownListListener onDropdownListListener) {
+        this.mOnDropdownListListener = onDropdownListListener;
     }
 
-    public interface OnDropdownListChecked {
+    public interface OnDropdownListListener {
 
         /**
          * 下拉列表item的点击回调
@@ -565,8 +591,310 @@ public class DropdownLayout extends FrameLayout {
          * @param textOfList    下拉列表对应的键
          * @param valueOfList   下拉列表对应的值
          */
-        void onDropdownListChecked(int indexOfButton, int indexOfList, String textOfList, String valueOfList);
+        void OnDropdownListSelected(int indexOfButton, int indexOfList, String textOfList, String valueOfList);
+
+        void onDropdownListOpen();
+
+        void onDropdownListClosed();
     }
      /*================== 下拉列表item的点击回调 end ==================*/
 
+    /*================== 自定义属性的getter和setter方法 begin ==================*/
+
+    public boolean isAnimationEnabled() {
+        return animationEnabled;
+    }
+
+    public void setAnimationEnabled(boolean animationEnabled) {
+        this.animationEnabled = animationEnabled;
+    }
+
+    public boolean isOnlyShowOne() {
+        return onlyShowOne;
+    }
+
+    public void setOnlyShowOne(boolean onlyShowOne) {
+        this.onlyShowOne = onlyShowOne;
+    }
+
+    public String getTopBtnTextPrefix() {
+        return topBtnTextPrefix;
+    }
+
+    public void setTopBtnTextPrefix(String topBtnTextPrefix) {
+        this.topBtnTextPrefix = topBtnTextPrefix;
+    }
+
+    public String getTopBtnTextSuffix() {
+        return topBtnTextSuffix;
+    }
+
+    public void setTopBtnTextSuffix(String topBtnTextSuffix) {
+        this.topBtnTextSuffix = topBtnTextSuffix;
+    }
+
+    public int getTopBg() {
+        return topBg;
+    }
+
+    public void setTopBg(int topBg) {
+        this.topBg = topBg;
+    }
+
+    public int getTopHeight() {
+        return topHeight;
+    }
+
+    public void setTopHeight(int topHeight) {
+        this.topHeight = topHeight;
+    }
+
+    public int getTopSplitLineColor() {
+        return topSplitLineColor;
+    }
+
+    public void setTopSplitLineColor(int topSplitLineColor) {
+        this.topSplitLineColor = topSplitLineColor;
+    }
+
+    public int getTopSplitLineWidth() {
+        return topSplitLineWidth;
+    }
+
+    public void setTopSplitLineWidth(int topSplitLineWidth) {
+        this.topSplitLineWidth = topSplitLineWidth;
+    }
+
+    public int getTopSplitLineHeight() {
+        return topSplitLineHeight;
+    }
+
+    public void setTopSplitLineHeight(int topSplitLineHeight) {
+        this.topSplitLineHeight = topSplitLineHeight;
+    }
+
+    public int getTopTextSize() {
+        return topTextSize;
+    }
+
+    public void setTopTextSize(int topTextSize) {
+        this.topTextSize = topTextSize;
+    }
+
+    public int getTopTextNormalColor() {
+        return topTextNormalColor;
+    }
+
+    public void setTopTextNormalColor(int topTextNormalColor) {
+        this.topTextNormalColor = topTextNormalColor;
+    }
+
+    public int getTopTextSelectedColor() {
+        return topTextSelectedColor;
+    }
+
+    public void setTopTextSelectedColor(int topTextSelectedColor) {
+        this.topTextSelectedColor = topTextSelectedColor;
+    }
+
+    public int getTopSelectedDrawableResId() {
+        return topSelectedDrawableResId;
+    }
+
+    public void setTopSelectedDrawableResId(int topSelectedDrawableResId) {
+        this.topSelectedDrawableResId = topSelectedDrawableResId;
+    }
+
+    public int getTopNormalDrawableResId() {
+        return topNormalDrawableResId;
+    }
+
+    public void setTopNormalDrawableResId(int topNormalDrawableResId) {
+        this.topNormalDrawableResId = topNormalDrawableResId;
+    }
+
+    public int getTopBottomLineWidth() {
+        return topBottomLineWidth;
+    }
+
+    public void setTopBottomLineWidth(int topBottomLineWidth) {
+        this.topBottomLineWidth = topBottomLineWidth;
+    }
+
+    public int getTopBottomLineHeight() {
+        return topBottomLineHeight;
+    }
+
+    public void setTopBottomLineHeight(int topBottomLineHeight) {
+        this.topBottomLineHeight = topBottomLineHeight;
+    }
+
+    public int getTopBottomLineColor() {
+        return topBottomLineColor;
+    }
+
+    public void setTopBottomLineColor(int topBottomLineColor) {
+        this.topBottomLineColor = topBottomLineColor;
+    }
+
+    public int getSplitLineColor() {
+        return splitLineColor;
+    }
+
+    public void setSplitLineColor(int splitLineColor) {
+        this.splitLineColor = splitLineColor;
+    }
+
+    public int getSplitLineWidth() {
+        return splitLineWidth;
+    }
+
+    public void setSplitLineWidth(int splitLineWidth) {
+        this.splitLineWidth = splitLineWidth;
+    }
+
+    public int getSplitLineHeight() {
+        return splitLineHeight;
+    }
+
+    public void setSplitLineHeight(int splitLineHeight) {
+        this.splitLineHeight = splitLineHeight;
+    }
+
+    public int getMaskBg() {
+        return maskBg;
+    }
+
+    public void setMaskBg(int maskBg) {
+        this.maskBg = maskBg;
+    }
+
+    public int getListMaxHeight() {
+        return listMaxHeight;
+    }
+
+    public void setListMaxHeight(int listMaxHeight) {
+        this.listMaxHeight = listMaxHeight;
+    }
+
+    public int getItemPaddingLeft() {
+        return itemPaddingLeft;
+    }
+
+    public void setItemPaddingLeft(int itemPaddingLeft) {
+        this.itemPaddingLeft = itemPaddingLeft;
+    }
+
+    public int getItemPaddingRight() {
+        return itemPaddingRight;
+    }
+
+    public void setItemPaddingRight(int itemPaddingRight) {
+        this.itemPaddingRight = itemPaddingRight;
+    }
+
+    public int getItemHeight() {
+        return itemHeight;
+    }
+
+    public void setItemHeight(int itemHeight) {
+        this.itemHeight = itemHeight;
+    }
+
+    public int getItemTextSize() {
+        return itemTextSize;
+    }
+
+    public void setItemTextSize(int itemTextSize) {
+        this.itemTextSize = itemTextSize;
+    }
+
+    public int getItemTextNormalColor() {
+        return itemTextNormalColor;
+    }
+
+    public void setItemTextNormalColor(int itemTextNormalColor) {
+        this.itemTextNormalColor = itemTextNormalColor;
+    }
+
+    public int getItemTextSelectedColor() {
+        return itemTextSelectedColor;
+    }
+
+    public void setItemTextSelectedColor(int itemTextSelectedColor) {
+        this.itemTextSelectedColor = itemTextSelectedColor;
+    }
+
+    public int getItemNormalBg() {
+        return itemNormalBg;
+    }
+
+    public void setItemNormalBg(int itemNormalBg) {
+        this.itemNormalBg = itemNormalBg;
+    }
+
+    public int getItemSelectedBg() {
+        return itemSelectedBg;
+    }
+
+    public void setItemSelectedBg(int itemSelectedBg) {
+        this.itemSelectedBg = itemSelectedBg;
+    }
+
+    public int getItemNormalDrawable() {
+        return itemNormalDrawable;
+    }
+
+    public void setItemNormalDrawable(int itemNormalDrawable) {
+        this.itemNormalDrawable = itemNormalDrawable;
+    }
+
+    public int getItemSelectedDrawable() {
+        return itemSelectedDrawable;
+    }
+
+    public void setItemSelectedDrawable(int itemSelectedDrawable) {
+        this.itemSelectedDrawable = itemSelectedDrawable;
+    }
+
+    public int getItemTextGravity() {
+        return itemTextGravity;
+    }
+
+    public void setItemTextGravity(int itemTextGravity) {
+        this.itemTextGravity = itemTextGravity;
+    }
+
+    public int getItemBottomLineHeight() {
+        return itemBottomLineHeight;
+    }
+
+    public void setItemBottomLineHeight(int itemBottomLineHeight) {
+        this.itemBottomLineHeight = itemBottomLineHeight;
+    }
+
+    public int getItemBottomLineMarginLeft() {
+        return itemBottomLineMarginLeft;
+    }
+
+    public void setItemBottomLineMarginLeft(int itemBottomLineMarginLeft) {
+        this.itemBottomLineMarginLeft = itemBottomLineMarginLeft;
+    }
+
+    public int getItemBottomLineMarginRight() {
+        return itemBottomLineMarginRight;
+    }
+
+    public void setItemBottomLineMarginRight(int itemBottomLineMarginRight) {
+        this.itemBottomLineMarginRight = itemBottomLineMarginRight;
+    }
+
+    public int getItemBottomLineColor() {
+        return itemBottomLineColor;
+    }
+
+    public void setItemBottomLineColor(int itemBottomLineColor) {
+        this.itemBottomLineColor = itemBottomLineColor;
+    }
+    /*================== 自定义属性的getter和setter方法 end ==================*/
 }
