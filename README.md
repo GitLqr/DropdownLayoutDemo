@@ -84,6 +84,7 @@
 
 
 以下是自定义的属性，用于xml布局，绝大程度地订制整个下拉控件：
+
 	<resources>
 	    <declare-styleable name="DropdownLayout">
 	        <!--下拉列表的列数-->
